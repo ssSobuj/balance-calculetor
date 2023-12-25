@@ -10,6 +10,7 @@ import Sinup from "../pages/auth/singup/Sinup";
 import Users from "../pages/users/Users";
 import User from "../componets/user/User";
 import Error from "../componets/errorPage/Error";
+import PrivateRoutes from "./PrivateRoutes";
 
 export const routes = createBrowserRouter([
   {
@@ -30,7 +31,7 @@ export const routes = createBrowserRouter([
       },
       {
         path: "users",
-        element: <Users />,
+        element: <PrivateRoutes><Users /></PrivateRoutes>,
         loader: () => fetch("https://jsonplaceholder.typicode.com/users"),
       },
       {

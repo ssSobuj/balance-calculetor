@@ -1,7 +1,16 @@
 import { Link, NavLink } from "react-router-dom";
 import "./Header.css";
+import { useAuthState } from "react-firebase-hooks/auth";
+import auth from "../../firebase/firebase.config";
+import { signOut } from "firebase/auth";
 
 export default function Header() {
+  const [user] = useAuthState(auth);
+  console.log(user);
+  const logOut = () => {
+    signOut(auth);
+  };
+
   return (
     <>
       <div className="header-wrap">
@@ -35,15 +44,23 @@ export default function Header() {
                   Users
                 </NavLink>
               </li>
+              {user ? (
+                <li>
+                  <Link onClick={logOut} className="nav-link">
+                    Log Out
+                  </Link>
+                </li>
+              ) : (
+                <li>
+                  <NavLink className="nav-link" to={"./login"}>
+                    Log in
+                  </NavLink>
+                </li>
+              )}
               <li>
-                <NavLink className="nav-link" to={"./login"}>
-                  Log in
-                </NavLink>
-              </li>
-              <li>
-                <NavLink className="nav-link" to={"./singup"}>
-                  Sing up
-                </NavLink>
+                {
+                  user?.photoURL && <img src={user?.photoURL} alt="" />
+                }
               </li>
             </ul>
           </div>

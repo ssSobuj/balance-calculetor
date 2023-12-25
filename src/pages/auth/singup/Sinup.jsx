@@ -11,6 +11,7 @@ import {
 } from "react-firebase-hooks/auth";
 import { toast } from "react-toastify";
 import auth from "../../../firebase/firebase.config";
+import Loading from "./../../../componets/loaading/Loading";
 
 export default function Sinup() {
   useEffect(() => {
@@ -20,49 +21,65 @@ export default function Sinup() {
   const goBackToHome = () => {
     naviget("/");
   };
-  // const [updateProfile, updating, profilError] = useUpdateProfile(auth);
   const [createUserWithEmailAndPassword, user, loading, error] =
-    useCreateUserWithEmailAndPassword(auth);
+    useCreateUserWithEmailAndPassword(auth, {
+      sendEmailVerification: true,
+    });
+  const [updateProfile, updating] = useUpdateProfile(auth);
 
-  // const handleSignup = async (e) => {
-  //   e.preventDefault();
-  //   const username = e.target.username.value;
-  //   const email = e.target.email.value;
-  //   const password = e.target.password.value;
-  //   const confirmPassword = e.target.confirmPassword.value;
-  //   if (password !== confirmPassword) {
-  //     return toast.error("your password dose not macht");
-  //   }
-  //   createUserWithEmailAndPassword(email, password);
-  //   await updateProfile({ username });
-  //   return toast.success("Sign up succsesfully");
-  // };
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  if (loading || updating) {
+    return <Loading></Loading>;
+  }
+  let errorElement;
+  if(error){
+    errorElement = <p style={{backgroundColor:'red', width:"600px", color:'wheat'}}>
+      {error?.message}
+    </p>
+  }
+  if(user){
+    naviget('/')
+  }
 
-  const onSubmit = async (data) => {
-    const name = data.UserName;
-    const email = data.Email;
-    const password = data.Password;
-    const confirmPassword = data.confirmPassword;
-    // console.log(name, email, password, confirmPassword);
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    const username = e.target.username.value;
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    const confirmPassword = e.target.confirmPassword.value;
     if (password !== confirmPassword) {
       return toast.error("your password dose not macht");
     }
-    try {
-      await createUserWithEmailAndPassword(email, password);
-      toast.success("Sign up successfully");
-    } catch {
-      toast.error("Error creating user");
-    }
+    await createUserWithEmailAndPassword(email, password);
+    await updateProfile({displayName: username})
+    return toast.success("Sign up succsesfully");
   };
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   formState: { errors },
+  // } = useForm();
+
+  // const onSubmit = async (data) => {
+  //   const name = data.UserName;
+  //   const email = data.Email;
+  //   const password = data.Password;
+  //   const confirmPassword = data.confirmPassword;
+  //   // console.log(name, email, password, confirmPassword);
+  //   if (password !== confirmPassword) {
+  //     return toast.error("your password dose not macht");
+  //   }
+  //   try {
+  //     await createUserWithEmailAndPassword(email, password);
+  //     toast.success("Sign up successfully");
+  //   } catch {
+  //     toast.error("Error creating user");
+  //   }
+  // };
 
   return (
     <>
-      <div className="signup-container">
+      {/* <div className="signup-container">
         <h2 className="title">Sign Up</h2>
         <p>
           You allredy have an acount: <Link to={"/login"}>Log in</Link>{" "}
@@ -106,9 +123,9 @@ export default function Sinup() {
         <div className="goback">
           <button onClick={goBackToHome}>go back to home</button>
         </div>
-      </div>
+      </div> */}
 
-      {/* <div className="signup-container">
+      <div className="signup-container">
         <h2 className="title">Sign Up</h2>
         <p>
           You allredy have an acount: <Link to={"/login"}>Log in</Link>{" "}
@@ -156,7 +173,7 @@ export default function Sinup() {
         <div className="goback">
           <button onClick={goBackToHome}>go back to home</button>
         </div>
-      </div> */}
+      </div>
     </>
   );
 }
